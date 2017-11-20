@@ -10,7 +10,7 @@ class Config:
     """
     Base configuration
     """
-    SECRET_KEY = os.environ.get('MOSQUITTO_AUTH_KEY') or 'djkugjycvdfdfgd!'
+    SECRET_KEY = os.environ.get('MOSQUITTO_AUTH_KEY') or 'abcdefghijkl'
     TOKEN_EXPIRATION_TIME = 600
     RESTPLUS_SWAGGER_UI_DOC_EXPANSION = 'list'
     RESTPLUS_VALIDATE = True

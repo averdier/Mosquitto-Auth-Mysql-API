@@ -24,3 +24,12 @@ api = Api(blueprint,
           authorizations=authorizations,
           security='tokenKey'
           )
+
+
+from .endpoints.token import ns as token_namespace
+from .endpoints.clients import ns as client_namespace
+from .endpoints.accesses import ns as accesses_namespace
+
+api.add_namespace(token_namespace)
+api.add_namespace(client_namespace)
+api.add_namespace(accesses_namespace)

@@ -17,20 +17,18 @@ def create_app(config_name='default'):
     app.config.from_object(config[config_name])
     config[config_name].init_app(app)
 
+    from .api import blueprint as api_blueprint
+    app.register_blueprint(api_blueprint)
+
     extensions(app)
 
     with app.app_context():
         from app.models import User, MqttClient, MqttAccess
         db.create_all()
 
-        admin = User.query.filter_by(is_admin=True).first()
-
-        if not admin:
-            admin = User()
-            admin.username = 'averdier'
+        if len(User.query.all()) == 0:
+            admin = User(username='averdier')
             admin.hash_password('averdier')
-            admin.is_admin = True
-
             db.session.add(admin)
             db.session.commit()
 

@@ -31,7 +31,7 @@ def verify_token(token):
     """
     user = User.verify_auth_token(token)
 
-    if not user or not user.is_admin:
+    if not user:
         return False
 
     g.user = user
@@ -77,7 +77,6 @@ class UserCollection(Resource):
         user = User()
         user.username = data['username']
         user.hash_password(data['password'])
-        user.is_admin = data['is_admin']
 
         if data.get('email', None) is not None:
             user.email = data['email']
@@ -124,10 +123,6 @@ class UserItem(Resource):
 
         if data.get('email', None) is not None:
             user.email = data['email']
-            patched = True
-
-        if data.get('is_admin', None) is not None:
-            user.is_admin = data['is_admin']
             patched = True
 
         if patched:

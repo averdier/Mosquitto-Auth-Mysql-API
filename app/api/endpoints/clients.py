@@ -5,7 +5,7 @@ from flask_restplus import Namespace, Resource, abort
 from flask_httpauth import HTTPTokenAuth
 from ..serializers.clients import client_post, client_patch, client_minimal, client_detail, client_data_container
 from app.extensions import db
-from app.models import User
+from app.models import User, MqttClient
 
 ns = Namespace('clients', description='Clients related operations')
 
@@ -54,15 +54,37 @@ class ClientCollection(Resource):
 
     @ns.marshal_with(client_data_container)
     def get(self):
-        pass
+        """
+        Return mqtt clients list
+        """
+
+        return {'clients': MqttClient.query.all()}
 
     @ns.marshal_with(client_minimal, code=201, description='Client successfully added.')
     @ns.doc(response={
-        409: 'Value exist'
+        400: 'Validation error'
     })
     @ns.expect(client_post)
     def post(self):
-        pass
+        """
+        Add mqtt client
+        """
+        data = request.json
+
+        print(data)
+
+        if MqttClient.query.filter_by(username=data['username']).first() is not None:
+            abort(400, error='Username already exist')
+
+        client = MqttClient()
+        client.username = data['username']
+        client.hash_password(data['password'])
+        client.is_admin = data['is_admin']
+
+        db.session.add(client)
+        db.session.commit()
+
+        return client, 201
 
 
 @ns.route('/<int:id>')
@@ -72,13 +94,48 @@ class ClientItem(Resource):
 
     @ns.marshal_with(client_detail)
     def get(self, id):
-        pass
+        """
+        Get client
+        """
+        client = MqttClient.query.get_or_404(id)
+
+        return client
 
     @ns.response(204, 'Client successfully patched.')
     @ns.expect(client_patch)
     def patch(self, id):
-        pass
+        """
+        Patch client
+        """
+
+        client = MqttClient.query_or_404(id)
+
+        data = request.json
+
+        patched = False
+        if data.get('password', None) is not None:
+            client.hash_password(data['password'])
+            patched = True
+
+        if data.get('is_admin', None) is not None:
+            client.is_admin = data['is_admin']
+            patched = True
+
+        if patched:
+            db.session.add(client)
+            db.session.commit()
+
+        return 'Client successfully patched.', 204
 
     @ns.response(204, 'Client successfully deleted.')
     def delete(self, id):
-        pass
+        """
+        Delete client
+        """
+
+        client = MqttClient.query.get_or_404(id)
+
+        db.session.delete(client)
+        db.session.commit()
+
+        return 'Client successfully deleted.', 204

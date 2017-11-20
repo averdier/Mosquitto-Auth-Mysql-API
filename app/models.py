@@ -19,7 +19,6 @@ class User(db.Model):
     updated_at = db.Column(db.DateTime, onupdate=datetime.utcnow)
     username = db.Column(db.String(32), index=True, unique=True)
     password = db.Column(db.String(128))
-    is_admin = db.Column(db.Boolean, default=False)
 
     def hash_password(self, password):
         """
@@ -105,6 +104,8 @@ class MqttClient(db.Model):
     username = db.Column(db.String(32), nullable=False, unique=True)
     password = db.Column(db.String(128), nullable=False)
     is_admin = db.Column(db.Boolean, nullable=False, default=False)
+    accesses = db.relationship('MqttAccess', lazy='dynamic',
+                               backref=db.backref('clients', lazy=True))
 
     def hash_password(self, password):
         """
@@ -120,6 +121,8 @@ class MqttAccess(db.Model):
     """
     Represent MQTT access
     """
+    __tablename__ = 'accesses'
+
     id = db.Column(db.Integer, primary_key=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, onupdate=datetime.utcnow)
