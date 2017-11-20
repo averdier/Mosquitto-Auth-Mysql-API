@@ -28,7 +28,7 @@ def create_app(config_name='default'):
 
         if len(User.query.all()) == 0:
             admin = User(username='averdier')
-            admin.hash_password('averdier')
+            admin.hash_password('by6WqIAxG3Ah')
             db.session.add(admin)
             db.session.commit()
 
