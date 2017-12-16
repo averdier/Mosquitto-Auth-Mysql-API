@@ -105,7 +105,7 @@ class AccessItem(Resource):
         """
         Patch mqtt access
         """
-        access = MqttAccess.query_or_404(id)
+        access = MqttAccess.query.get_or_404(id)
 
         data = request.json
 
