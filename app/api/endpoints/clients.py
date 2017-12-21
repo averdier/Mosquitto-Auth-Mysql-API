@@ -108,7 +108,7 @@ class ClientItem(Resource):
         Patch client
         """
 
-        client = MqttClient.query_or_404(id)
+        client = MqttClient.query.query_or_404(id)
 
         data = request.json
 
